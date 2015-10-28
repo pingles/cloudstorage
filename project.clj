@@ -1,4 +1,4 @@
-(defproject cloudstorage "0.1.0-SNAPSHOT"
+(defproject cloudstorage "0.1.0"
   :description "Google Cloud Storage client"
   :url "https://github.com/pingles/cloudstorage"
   :license {:name "Eclipse Public License"
