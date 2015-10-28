@@ -1,6 +1,7 @@
 (ns cloudstorage.storage
   (:require [clojure.java.io :as io])
-  (:import [com.google.api.services.storage.model Bucket StorageObject]))
+  (:import [com.google.api.services.storage.model Bucket StorageObject]
+           [com.google.api.client.http InputStreamContent]))
 
 (defprotocol ToClojure
   (to-clojure [_]))
@@ -66,3 +67,15 @@
                                                      :or   {resumable true}}]
                                 (-> op (.getMediaHttpDownloader) (.setDirectDownloadEnabled (not resumable)))
                                 (.executeMediaAndDownloadTo op (io/output-stream out)))))))
+
+
+(defn insert-object
+  "Inserts an object of name into the specified bucket, media-content is
+  coerced into an input stream with clojure.java.io/input-stream."
+  [service bucket name media-content & {:keys [content-type]}]
+  (let [input (InputStreamContent. content-type
+                                   (io/input-stream media-content))
+        storage-object (doto (StorageObject. )
+                         (.setName name))
+        op (-> service (.objects) (.insert bucket storage-object input))]
+    (to-clojure (.execute op))))
